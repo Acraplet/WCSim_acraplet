@@ -1380,7 +1380,7 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
 	    */
 
 	    wcsimrootevent = wcsimrootsuperevent->GetTrigger(choose_event);
-	    wcsimrootevent->AddTrack(ipnu,
+	    WCSimRootTrack* addedTrack = wcsimrootevent->AddTrack(ipnu,
 				     flag,
 				     mass,
 				     mommag,
@@ -1400,6 +1400,20 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
 				     trj->GetBoundaryKEs(),
 				     trj->GetBoundaryTimes(),
 				     trj->GetBoundaryTypesAsInt());
+
+	    // Largest single-step deflection ("scatter") info, only meaningful
+	    // for primary tracks (see WCSimTrajectory::AppendStep)
+	    if (trj->GetParentID() == 0) {
+	      G4ThreeVector scatterPos = trj->GetMaxScatterPosition();
+	      G4ThreeVector scatterPreDir = trj->GetMaxScatterPreDirection();
+	      G4ThreeVector scatterPostDir = trj->GetMaxScatterPostDirection();
+	      addedTrack->SetMaxScatterInfo(trj->GetMaxScatterAngleDeg(), trj->GetMaxScatterProcessName(),
+					     scatterPos.x()/cm, scatterPos.y()/cm, scatterPos.z()/cm,
+					     scatterPreDir.x(), scatterPreDir.y(), scatterPreDir.z(),
+					     scatterPostDir.x(), scatterPostDir.y(), scatterPostDir.z(),
+					     trj->GetMaxScatterKEPre(), trj->GetMaxScatterKEPost(),
+					     trj->GetNScattersAbove7Deg());
+	    }
 
 	    if (detectorConstructor->SavePi0Info())
 	      {
@@ -1974,7 +1988,7 @@ void WCSimEventAction::FillRootEventHybrid(G4int event_id,
 	    */
 
 	    wcsimrootevent = wcsimrootsuperevent->GetTrigger(choose_event);
-	    wcsimrootevent->AddTrack(ipnu,
+	    WCSimRootTrack* addedTrack = wcsimrootevent->AddTrack(ipnu,
 				     flag,
 				     mass,
 				     mommag,
@@ -1994,6 +2008,20 @@ void WCSimEventAction::FillRootEventHybrid(G4int event_id,
 				     trj->GetBoundaryKEs(),
 				     trj->GetBoundaryTimes(),
 				     trj->GetBoundaryTypesAsInt());
+
+	    // Largest single-step deflection ("scatter") info, only meaningful
+	    // for primary tracks (see WCSimTrajectory::AppendStep)
+	    if (trj->GetParentID() == 0) {
+	      G4ThreeVector scatterPos = trj->GetMaxScatterPosition();
+	      G4ThreeVector scatterPreDir = trj->GetMaxScatterPreDirection();
+	      G4ThreeVector scatterPostDir = trj->GetMaxScatterPostDirection();
+	      addedTrack->SetMaxScatterInfo(trj->GetMaxScatterAngleDeg(), trj->GetMaxScatterProcessName(),
+					     scatterPos.x()/cm, scatterPos.y()/cm, scatterPos.z()/cm,
+					     scatterPreDir.x(), scatterPreDir.y(), scatterPreDir.z(),
+					     scatterPostDir.x(), scatterPostDir.y(), scatterPostDir.z(),
+					     trj->GetMaxScatterKEPre(), trj->GetMaxScatterKEPost(),
+					     trj->GetNScattersAbove7Deg());
+	    }
 
 	    if (detectorConstructor->SavePi0Info())
 	      {

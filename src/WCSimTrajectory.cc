@@ -136,6 +136,15 @@ WCSimTrajectory::WCSimTrajectory(WCSimTrajectory & right):G4VTrajectory()
   boundaryTimes = right.boundaryTimes;
   boundaryTypes = right.boundaryTypes;
 
+  fMaxScatterAngleDeg = right.fMaxScatterAngleDeg;
+  fMaxScatterProcess = right.fMaxScatterProcess;
+  fMaxScatterPos = right.fMaxScatterPos;
+  fMaxScatterPreDir = right.fMaxScatterPreDir;
+  fMaxScatterPostDir = right.fMaxScatterPostDir;
+  fMaxScatterKEPre = right.fMaxScatterKEPre;
+  fMaxScatterKEPost = right.fMaxScatterKEPost;
+  fNScattersAbove7Deg = right.fNScattersAbove7Deg;
+
 #ifdef WCSIM_SAVE_PHOTON_HISTORY
   pRayScatter = right.pRayScatter;
   pRamScatter = right.pRamScatter;
@@ -280,6 +289,33 @@ void WCSimTrajectory::AppendStep(const G4Step* aStep)
       std::vector<G4float> bPs(3);
       bPs[0] = track->GetPosition().x(); bPs[1] = track->GetPosition().y(); bPs[2] = track->GetPosition().z();
       AddBoundaryPoint(bPs, track->GetKineticEnergy(), track->GetGlobalTime(), ty);
+    }
+  }
+
+  // Track the largest single-step deflection ("scatter") of a primary
+  // particle (fParentID==0), for scatter reconstruction downstream.
+  // A discrete process (e.g. hadElastic) shows up as one step with a large
+  // angle here; continuous multiple/Coulomb scattering (msc) is spread over
+  // many small-angle steps, so this naturally highlights real scatters.
+  if (fParentID == 0)
+  {
+    const G4Track* track = aStep->GetTrack();
+    G4ThreeVector preDir  = thePrePoint->GetMomentumDirection();
+    G4ThreeVector postDir = thePostPoint->GetMomentumDirection();
+    G4double angleDeg = preDir.angle(postDir) / CLHEP::deg;
+
+    if (angleDeg > 7.0) fNScattersAbove7Deg++;
+
+    if (angleDeg > fMaxScatterAngleDeg)
+    {
+      fMaxScatterAngleDeg = angleDeg;
+      const G4VProcess* proc = thePostPoint->GetProcessDefinedStep();
+      fMaxScatterProcess = proc ? proc->GetProcessName() : "";
+      fMaxScatterPos     = track->GetPosition();
+      fMaxScatterPreDir  = preDir;
+      fMaxScatterPostDir = postDir;
+      fMaxScatterKEPre   = thePrePoint->GetKineticEnergy();
+      fMaxScatterKEPost  = thePostPoint->GetKineticEnergy();
     }
   }
 

@@ -887,6 +887,24 @@ bool WCSimRootTrack::CompareAllVariables(const WCSimRootTrack * c) const
   failed = (!ComparisonPassedVec(boundaryTimes, c->GetBoundaryTimes(), typeid(*this).name(), __func__, "boundaryTimes")) || failed;
   failed = (!ComparisonPassedVec(boundaryTypes, c->GetBoundaryTypes(), typeid(*this).name(), __func__, "boundaryTypes")) || failed;
   failed = (!ComparisonPassed(fCreatorProcess, c->GetCreatorProcess(), typeid(*this).name(), __func__, "CreatorProcess")) || failed;
+  failed = (!ComparisonPassed(fMaxScatterAngleDeg, c->GetMaxScatterAngleDeg(), typeid(*this).name(), __func__, "MaxScatterAngleDeg")) || failed;
+  if (fMaxScatterProcess != c->GetMaxScatterProcess()) {
+    std::cerr << typeid(*this).name() << "::" << __func__ << " MaxScatterProcess not equal: "
+              << fMaxScatterProcess << ", " << c->GetMaxScatterProcess() << std::endl;
+    failed = true;
+  }
+  for(int i = 0; i < 3; i++) {
+    failed = (!ComparisonPassed(fMaxScatterPos[i], c->GetMaxScatterPos(i), typeid(*this).name(), __func__, TString::Format("%s[%d]", "MaxScatterPos", i))) || failed;
+  }//i
+  for(int i = 0; i < 3; i++) {
+    failed = (!ComparisonPassed(fMaxScatterPreDir[i], c->GetMaxScatterPreDir(i), typeid(*this).name(), __func__, TString::Format("%s[%d]", "MaxScatterPreDir", i))) || failed;
+  }//i
+  for(int i = 0; i < 3; i++) {
+    failed = (!ComparisonPassed(fMaxScatterPostDir[i], c->GetMaxScatterPostDir(i), typeid(*this).name(), __func__, TString::Format("%s[%d]", "MaxScatterPostDir", i))) || failed;
+  }//i
+  failed = (!ComparisonPassed(fMaxScatterKEPre, c->GetMaxScatterKEPre(), typeid(*this).name(), __func__, "MaxScatterKEPre")) || failed;
+  failed = (!ComparisonPassed(fMaxScatterKEPost, c->GetMaxScatterKEPost(), typeid(*this).name(), __func__, "MaxScatterKEPost")) || failed;
+  failed = (!ComparisonPassed(fNScattersAbove7Deg, c->GetNScattersAbove7Deg(), typeid(*this).name(), __func__, "NScattersAbove7Deg")) || failed;
 
   return !failed;
 }

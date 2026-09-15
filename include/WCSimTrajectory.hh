@@ -114,6 +114,17 @@ public: // with description
     return bTypes;
   }
 
+// Functions to get the largest single-step deflection ("scatter") of a
+// primary track. Computed in AppendStep() for tracks with fParentID==0 only.
+  inline G4double GetMaxScatterAngleDeg() const { return fMaxScatterAngleDeg; }
+  inline G4String GetMaxScatterProcessName() const { return fMaxScatterProcess; }
+  inline G4ThreeVector GetMaxScatterPosition() const { return fMaxScatterPos; }
+  inline G4ThreeVector GetMaxScatterPreDirection() const { return fMaxScatterPreDir; }
+  inline G4ThreeVector GetMaxScatterPostDirection() const { return fMaxScatterPostDir; }
+  inline G4double GetMaxScatterKEPre() const { return fMaxScatterKEPre; }
+  inline G4double GetMaxScatterKEPost() const { return fMaxScatterKEPost; }
+  inline G4int GetNScattersAbove7Deg() const { return fNScattersAbove7Deg; }
+
 // Functions to set/get photon history
   inline void AddPhotonRayScatter(G4int val) { pRayScatter += val; }
   inline void AddPhotonRamScatter(G4int val) { pRamScatter += val; }
@@ -172,6 +183,17 @@ public: // with description
   std::vector<G4float> boundaryKEs;
   std::vector<G4double> boundaryTimes;
   std::vector<BoundaryType_t> boundaryTypes; ///< kBlackSheet=1, kMPMT=2, kInnerTyvek=3, kOuterTyvek=4
+
+  // Largest single-step deflection ("scatter") of a primary track (fParentID==0),
+  // tracked across AppendStep() calls. fMaxScatterAngleDeg == -1 means "no step seen yet".
+  G4double fMaxScatterAngleDeg = -1;
+  G4String fMaxScatterProcess = "";
+  G4ThreeVector fMaxScatterPos = G4ThreeVector();
+  G4ThreeVector fMaxScatterPreDir = G4ThreeVector();
+  G4ThreeVector fMaxScatterPostDir = G4ThreeVector();
+  G4double fMaxScatterKEPre = -1;
+  G4double fMaxScatterKEPost = -1;
+  G4int fNScattersAbove7Deg = 0;
 
   // Photon reflection/scattering history
   G4int pRayScatter;

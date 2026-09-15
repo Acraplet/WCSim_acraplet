@@ -61,6 +61,17 @@ private:
   std::vector<double> boundaryTimes; //!< The time as the particle crossed the blacksheet/tyvek/cave (units: ns)
   std::vector<int> boundaryTypes; //!< The surface the particle has crossed. 1 = blacksheet (boundary between ID & dead space), 2 = mPMT, 3 = inner tyvek (boundary between dead space and OD), 3 = outer tyvek (boundary between OD & rock wall). Note that all boundary* variables are in synch
 
+  // Largest single-step deflection ("scatter") along this track. Only ever
+  // set for primary tracks (fParenttype==0); -1 = not a primary / no step recorded.
+  Float_t fMaxScatterAngleDeg = -1; //!< Largest single-step deflection angle for this (primary) track (units: degrees)
+  std::string fMaxScatterProcess; //!< Name of the process that defined the step with the largest deflection
+  Float_t fMaxScatterPos[3] = {0,0,0}; //!< Position of the largest-deflection step. Vector in x,y,z (units: cm)
+  Float_t fMaxScatterPreDir[3] = {0,0,0}; //!< Track direction just before the largest-deflection step. Unit vector in x,y,z
+  Float_t fMaxScatterPostDir[3] = {0,0,0}; //!< Track direction just after the largest-deflection step. Unit vector in x,y,z
+  Float_t fMaxScatterKEPre = -1; //!< Kinetic energy just before the largest-deflection step (units: MeV)
+  Float_t fMaxScatterKEPost = -1; //!< Kinetic energy just after the largest-deflection step (units: MeV)
+  Int_t fNScattersAbove7Deg = 0; //!< Number of steps along this track with a single-step deflection angle > 7 degrees
+
 public:
   WCSimRootTrack() {}
   WCSimRootTrack(Int_t ipnu, 
@@ -108,7 +119,31 @@ public:
   std::vector<double> GetBoundaryTimes() const {return boundaryTimes;}
   std::vector<int> GetBoundaryTypes() const {return boundaryTypes;}
 
-  ClassDef(WCSimRootTrack,4)
+  void SetMaxScatterInfo(Float_t angleDeg, const std::string& processName,
+                          Float_t x, Float_t y, Float_t z,
+                          Float_t preDirX, Float_t preDirY, Float_t preDirZ,
+                          Float_t postDirX, Float_t postDirY, Float_t postDirZ,
+                          Float_t kePre, Float_t kePost, Int_t nAbove7Deg)
+  {
+    fMaxScatterAngleDeg = angleDeg;
+    fMaxScatterProcess = processName;
+    fMaxScatterPos[0] = x; fMaxScatterPos[1] = y; fMaxScatterPos[2] = z;
+    fMaxScatterPreDir[0] = preDirX; fMaxScatterPreDir[1] = preDirY; fMaxScatterPreDir[2] = preDirZ;
+    fMaxScatterPostDir[0] = postDirX; fMaxScatterPostDir[1] = postDirY; fMaxScatterPostDir[2] = postDirZ;
+    fMaxScatterKEPre = kePre;
+    fMaxScatterKEPost = kePost;
+    fNScattersAbove7Deg = nAbove7Deg;
+  }
+  Float_t     GetMaxScatterAngleDeg() const { return fMaxScatterAngleDeg; }
+  std::string GetMaxScatterProcess() const { return fMaxScatterProcess; }
+  Float_t     GetMaxScatterPos(Int_t i=0) const {return (i<3) ? fMaxScatterPos[i] : 0;}
+  Float_t     GetMaxScatterPreDir(Int_t i=0) const {return (i<3) ? fMaxScatterPreDir[i] : 0;}
+  Float_t     GetMaxScatterPostDir(Int_t i=0) const {return (i<3) ? fMaxScatterPostDir[i] : 0;}
+  Float_t     GetMaxScatterKEPre() const { return fMaxScatterKEPre; }
+  Float_t     GetMaxScatterKEPost() const { return fMaxScatterKEPost; }
+  Int_t       GetNScattersAbove7Deg() const { return fNScattersAbove7Deg; }
+
+  ClassDef(WCSimRootTrack,5)
 };
 
 
